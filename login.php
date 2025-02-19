@@ -131,7 +131,11 @@
             $_SESSION["username"] = $user["username"];
             $_SESSION["role"] = $user["role"];
 
-            header("Location: index.php");
+            if ($_SESSION["role"] == "artisan") {
+                header("Location:artisan_folder\artisan_dashboard.php");
+            } else {
+                header("Location: buyer_dashboard.php");
+            }            
             exit();
         } else {
             echo "<script>alert('Invalid email or password!');</script>";
