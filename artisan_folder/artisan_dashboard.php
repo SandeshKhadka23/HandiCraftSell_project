@@ -30,9 +30,9 @@ $result = $stmt->get_result();
             <span class="brand-name">NepArt Creations</span>
         </div>
         <div class="nav-links">
-             <a href="view_orders.php">Manage Orders</a>
+             <a href="view_orders.php" class="nav-button">Manage Orders</a>
             <a href="add_product.php" class="nav-button"><i class="fas fa-plus"></i> Add Product</a>
-            <a href="logout.php" class="nav-button"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <a href="../logout.php" class="nav-button"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
     </nav>
 

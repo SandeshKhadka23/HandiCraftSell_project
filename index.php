@@ -9,7 +9,8 @@
 <body>
     
     <header>
-        <div class="logo">HandiCrafts</div>
+        <img src="artisan_folder/download.png" alt="Logo" class="logo">
+        <span class="brand-name">NepArt Creations</span>
         <input type="text" placeholder="Search..." class="search-bar">
         <button class="login-btn">Login / Register</button>
     </header>

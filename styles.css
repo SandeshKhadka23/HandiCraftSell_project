@@ -14,9 +14,14 @@ header {
     color: white;
 }
 
-.logo {
-    font-size: 24px;
-    font-weight: bold;
+  .logo {
+    height: 40px;
+    border-radius: 50%;
+}
+
+.brand-name {
+    font-size: 1 rem;
+    color:#b91111;
 }
 
 .search-bar {
