@@ -1,9 +1,5 @@
 <?php
 session_start();
-if (!isset($_SESSION["user_id"]) || $_SESSION["role"] != "buyer") {
-    header("Location:../login.php");
-    exit();
-}
 
 // Database connection
 $servername = "localhost";
@@ -36,14 +32,25 @@ $result_products = $conn->query($sql_products);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NepArt Creations</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styleb.css">
+    <link rel="stylesheet" href="buyer_folder/styleb.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+    .about .slider-container .about-content .buynowbttn{
+    background-color: #b91111;
+    height: 32px;
+    width: 127px;
+    border-radius: 20px;
+    border: none;
+    color: white;
+    margin-top: 40px;
+}
+    </style>
 </head>
 <body>
 <nav class="main-nav">
     <div class="nav-container">
         <div class="nav-left">
-            <img src="../artisan_folder/download.png" alt="Logo" class="logo">
+            <img src="artisan_folder/download.png" alt="Logo" class="logo">
             <span class="brand-name">NepArt Creations</span>
         </div>
         <div class="nav-right">
@@ -58,11 +65,12 @@ $result_products = $conn->query($sql_products);
                 }
                 ?>
             </select>
-            <a href="cart.php" class="nav-link cart-link">
-                <i class="fas fa-shopping-cart"></i> Cart
-                <span class="cart-badge" id="cart-count">0</span>
+            <a href="#" onclick="showLoginAlert('cart')" class="nav-link cart-link">
+                <i class="fas fa-shopping-cart"></i> 
+             
             </a>
-            <a href="logout.php" class="nav-link">Logout</a>
+            <a href="login.php" class="nav-link">Login</a>
+            <a href="register.php" class="nav-link">Register</a>
         </div>
     </div>
 </nav>
@@ -70,10 +78,12 @@ $result_products = $conn->query($sql_products);
 <section class="about">
     <div class="slider-container">
         <div class="about-content">
-            <h1>Welcome to NepArt Creations</h1>
-            <p><i>"Handmade Heritage, Crafted with Love"</i></p>
-            <br><br>
-            <p>Find and Purchase Your Favorite Handicrafts at the Best Prices.</p>
+        <h1>Welcome to NepArt Creations</h1>
+<p><i>"Crafted by Hands, Loved by Hearts"</i></p>
+<br><br>
+<p>Every craft embodies Nepal’s tradition, passion, and creativity.</p>
+<p>Celebrate artistry with handmade products that connect cultures and generations.</p>
+<button class="buynowbttn" onclick="showLoginAlert('buynowbttn')">Buy Now</button>
         </div>
     </div>
 </section>
@@ -85,7 +95,7 @@ $result_products = $conn->query($sql_products);
         if ($result_products->num_rows > 0) {
             while($row = $result_products->fetch_assoc()) {
                 echo '<div class="product-item" data-category-id="' . $row["category_id"] . '">';
-                echo '<img src="../uploads/products/' . htmlspecialchars($row['image']) . '" alt="' . htmlspecialchars($row['product_name']) . '" class="product-image">';
+                echo '<img src="uploads/products/' . htmlspecialchars($row['image']) . '" alt="' . htmlspecialchars($row['product_name']) . '" class="product-image">';
                 echo '<h2>' . htmlspecialchars($row["product_name"]) . '</h2>';
                 
                 echo '<p class="price">Price: Rs. ' . number_format($row["price"], 2) . '</p>';
@@ -104,8 +114,8 @@ $result_products = $conn->query($sql_products);
                 
                 echo '<div class="button-container">';
                 echo '<button class="details-btn" onclick="toggleDetails(this)">Show Details</button>';
-                echo '<button class="cart-btn" onclick="addToCart(this)" data-product-id="' . $row["product_id"] . '">Add to Cart</button>';
-                echo '<button class="buy-now-btn" onclick="buyNow(this)" data-product-id="' . $row["product_id"] . '">Buy Now</button>';
+                echo '<button class="cart-btn" onclick="showLoginAlert(\'cart\')">Add to Cart</button>';
+                echo '<button class="buy-now-btn" onclick="showLoginAlert(\'buy\')">Buy Now</button>';
                 echo '</div>';
                 
                 echo '</div>';
@@ -127,8 +137,6 @@ $result_products = $conn->query($sql_products);
         </div>
         <div class="quicklinks">
             <h3>Quick Links</h3>
-            <a href="cart.php">Cart</a><br>
-            <a href="trackorders.php">Track Orders</a><br>
             <a href="#products-section">See Products</a>
         </div>
         <div class="footer-section">
@@ -146,9 +154,110 @@ $result_products = $conn->query($sql_products);
 </footer>
 
 <script>
-let cart = {};
-let cartCount = 0;
+   // First, add this CSS to your stylesheet
+const css = `
+.custom-alert {
+    display: none;
+    position: fixed;
+    left: 50%;
+    top: 10%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+    min-width: 300px;
+}
 
+.custom-alert-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+}
+
+.custom-alert-buttons {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.custom-alert-buttons button {
+    padding: 8px 16px;
+    margin-left: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.custom-alert-buttons .login-btn {
+    background: #b91111;
+    color: white;
+    border: none;
+}
+
+.custom-alert-buttons .cancel-btn {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+}
+`;
+
+// Add the CSS to the document
+const styleSheet = document.createElement("style");
+styleSheet.innerText = css;
+document.head.appendChild(styleSheet);
+
+// Create and append alert HTML
+const alertHTML = `
+<div class="custom-alert-overlay" id="alertOverlay"></div>
+<div class="custom-alert" id="customAlert">
+    <div id="alertMessage"></div>
+    <div class="custom-alert-buttons">
+        <button class="cancel-btn" onclick="closeCustomAlert()">Cancel</button>
+        <button class="login-btn" onclick="redirectToLogin()">Login</button>
+    </div>
+</div>
+`;
+document.body.insertAdjacentHTML('beforeend', alertHTML);
+
+// Helper functions
+function closeCustomAlert() {
+    document.getElementById('customAlert').style.display = 'none';
+    document.getElementById('alertOverlay').style.display = 'none';
+}
+
+function redirectToLogin() {
+    window.location.href = 'login.php';
+}
+
+// Modified showLoginAlert function
+function showLoginAlert(action) {
+    let message = '';
+    switch(action) {
+        case 'cart':
+            message = 'Please login or register to add items to cart.';
+            break;
+        case 'buy':
+            message = 'Please login or register to purchase items.';
+            break;
+        case 'track':
+            message = 'Please login or register to track orders.';
+            break;
+        case 'buynowbttn':
+            message = 'Please login or register to purchase items.';
+            break;
+        default:
+            message = 'Please login or register to continue.';
+    }
+    
+    // Show custom alert
+    document.getElementById('alertMessage').textContent = message;
+    document.getElementById('customAlert').style.display = 'block';
+    document.getElementById('alertOverlay').style.display = 'block';
+}
 function updateQuantity(button, change) {
     const qtyInput = button.parentElement.querySelector('.qty-input');
     let currentQty = parseInt(qtyInput.value);
@@ -168,49 +277,6 @@ function toggleDetails(button) {
     const details = productItem.querySelector('.product-details');
     details.style.display = details.style.display === 'none' ? 'block' : 'none';
     button.textContent = details.style.display === 'block' ? 'Hide Details' : 'Show Details';
-}
-function addToCart(button) {
-    const productItem = button.closest('.product-item');
-    const productId = button.getAttribute('data-product-id');
-    const qtyInput = productItem.querySelector('.qty-input');
-    const quantity = parseInt(qtyInput.value);
-
-    const formData = new FormData();
-    formData.append('product_id', productId);
-    formData.append('quantity', quantity);
-
-    fetch('add_to_cart.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert(`${quantity} x ${data.product_name} added to cart.`);
-            updateCartCount(); // Update cart count if needed
-        } else {
-            alert(data.message || 'Error adding to cart');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error adding to cart');
-    });
-}
-
-function buyNow(button) {
-    const productItem = button.closest('.product-item');
-    const productId = button.getAttribute('data-product-id');
-    const qtyInput = productItem.querySelector('.qty-input');
-    const quantity = parseInt(qtyInput.value);
-
-    // Redirect to the checkout page with the product ID and quantity
-    window.location.href = `checkout.php?product_id=${productId}&quantity=${quantity}`;
-}
-
-function updateCartCount() {
-    const cartCountElement = document.getElementById('cart-count');
-    cartCountElement.textContent = cartCount;
 }
 
 function filterAndScrollToProducts() {
