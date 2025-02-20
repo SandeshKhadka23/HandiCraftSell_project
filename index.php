@@ -10,10 +10,37 @@
 <body>
     
     <header>
-        <img src="artisan_folder/download.png" alt="Logo" class="logo">
-        <span class="brand-name">NepArt Creations</span>
-        <input type="text" placeholder="Search..." class="search-bar">
-        <button class="login-btn">Login / Register</button>
+        <div class="logo">HandiCrafts</div>
+        <nav>
+            <div class="search-container">
+                <input type="text" placeholder="Search..." class="search-bar" aria-label="Search for products">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+
+        </nav>
+        <div class="header-icons">
+            <!-- Cart Icon before Login/Register -->
+            <div class="cart-container">
+                <div class="cart-icon">
+                    <i class="fas fa-shopping-cart"></i> $0.00
+                </div>
+                <div class="cart-dropdown">
+                    <div class="cart-empty">
+                        <i class="fas fa-shopping-bag"></i>
+                        <p>No products in the cart.</p>
+                        <button class="return-btn" onclick="returnToShop()">RETURN TO SHOP</button>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Login/Register Button -->
+            <button class="login-btn">Login / Register</button>
+
+            <button class="hamburger-menu" aria-label="Toggle Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
     </header>
     
     <section class="about">
