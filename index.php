@@ -11,12 +11,6 @@
 
 <body>
     <header>
-<<<<<<< HEAD:index.php
-        <img src="artisan_folder/download.png" alt="Logo" class="logo">
-        <span class="brand-name">NepArt Creations</span>
-        <input type="text" placeholder="Search..." class="search-bar">
-        <button class="login-btn">Login / Register</button>
-=======
         <div class="logo">HandiCrafts</div>
         <nav>
             <div class="search-container">
@@ -48,7 +42,6 @@
                 <i class="fas fa-bars"></i>
             </button>
         </div>
->>>>>>> 37565de026b20428ac30c383105a295733b6a7e1:index.html
     </header>
 
     <main>

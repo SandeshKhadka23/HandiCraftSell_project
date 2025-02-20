@@ -39,16 +39,6 @@ header:hover {
     background-color: #34495e;
 }
 
-<<<<<<< HEAD
-  .logo {
-    height: 40px;
-    border-radius: 50%;
-}
-
-.brand-name {
-    font-size: 1 rem;
-    color:#b91111;
-=======
 .logo {
     font-size: 28px;
     font-weight: bold;
@@ -103,7 +93,6 @@ header:hover {
 .search-container {
     position: relative;
     display: inline-block;
->>>>>>> 37565de026b20428ac30c383105a295733b6a7e1
 }
 
 .search-bar {
