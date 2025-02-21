@@ -355,7 +355,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-header('Content-Type: application/json');
+// header('Content-Type: application/json');
 
 if (!isset($_SESSION["user_id"])) {
     echo json_encode(['success' => false, 'message' => 'Not logged in']);
@@ -402,8 +402,8 @@ if (isset($_POST['cart_id']) && isset($_POST['change'])) {
     } else {
         echo json_encode(['success' => false, 'message' => 'Cart item not found']);
     }
-} else {
-    echo json_encode(['success' => false, 'message' => 'Invalid parameters']);
+// } else {
+//     echo json_encode(['success' => false, 'message' => 'Invalid parameters']);
 }
 ?>
 
@@ -413,7 +413,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-header('Content-Type: application/json');
+// header('Content-Type: application/json');
 
 if (!isset($_SESSION["user_id"])) {
     echo json_encode(['success' => false, 'message' => 'Not logged in']);
@@ -472,12 +472,13 @@ if (isset($_POST['cart_id'])) {
         ]);
     }
     $verify_stmt->close();
-} else {
-    echo json_encode([
-        'success' => false,
-        'message' => 'Invalid parameters: cart_id is required'
-    ]);
 }
+// } else {
+//     echo json_encode([
+//         'success' => false,
+//         'message' => 'Invalid parameters: cart_id is required'
+//     ]);
+// }
 
 $conn->close();
 ?>
