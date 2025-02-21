@@ -48,134 +48,9 @@ $result_cart->data_seek(0); // Reset result pointer
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styleb.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        .checkout-container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 20px;
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 2rem;
-        }
-
-        .checkout-form {
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .order-summary {
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            height: fit-content;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-        }
-
-        .form-group input, 
-        .form-group textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 1rem;
-        }
-
-        .form-group textarea {
-            height: 100px;
-            resize: vertical;
-        }
-
-        .payment-method {
-            margin: 2rem 0;
-            padding: 1rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-
-        .payment-method label {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 600;
-        }
-
-        .order-summary h2 {
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .order-items {
-            margin-bottom: 1.5rem;
-        }
-
-        .order-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid #eee;
-        }
-
-        .total-line {
-            display: flex;
-            justify-content: space-between;
-            font-weight: 600;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 2px solid #ddd;
-        }
-
-        .place-order-btn {
-            display: block;
-            width: 100%;
-            padding: 1rem;
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            margin-top: 1rem;
-        }
-
-        .place-order-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-
-        #response-message {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px;
-            border-radius: 5px;
-            display: none;
-            z-index: 1000;
-        }
-
-        @media (max-width: 768px) {
-            .checkout-container {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+   <link rel="stylesheet" href="checkout.css">
 </head>
 <body>
-    <div id="response-message"></div>
-    
     <nav class="main-nav">
         <div class="nav-container">
             <div class="nav-left">
@@ -189,10 +64,10 @@ $result_cart->data_seek(0); // Reset result pointer
                 <a href="cart.php" class="nav-link cart-link">
                     <i class="fas fa-shopping-cart"></i> Cart
                 </a>
-                <a href="logout.php" class="nav-link">Logout</a>
             </div>
         </div>
     </nav>
+    <div id="response-message"></div>
 
     <div class="checkout-container">
         <div class="checkout-form">
@@ -312,7 +187,7 @@ $result_cart->data_seek(0); // Reset result pointer
         
         const formData = new FormData(document.getElementById('checkoutForm'));
         
-        fetch('track_order.php', {
+        fetch('place_order.php', { // Changed to 'place_order.php'
             method: 'POST',
             body: formData
         })
@@ -321,7 +196,7 @@ $result_cart->data_seek(0); // Reset result pointer
             if (data.success) {
                 showMessage('Order placed successfully!');
                 setTimeout(() => {
-                    window.location.href = 'order_confirmation.php?order_id=' + data.order_id;
+                    window.location.href = 'track_order.php?order_id=' + data.order_id;
                 }, 2000);
             } else {
                 showMessage(data.message || 'Error placing order', false);

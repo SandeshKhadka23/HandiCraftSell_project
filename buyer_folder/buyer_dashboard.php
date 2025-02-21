@@ -128,7 +128,7 @@ $result_products = $conn->query($sql_products);
         <div class="quicklinks">
             <h3>Quick Links</h3>
             <a href="cart.php">Cart</a><br>
-            <a href="trackorders.php">Track Orders</a><br>
+            <a href="track_order.php">Track Orders</a><br>
             <a href="#products-section">See Products</a>
         </div>
         <div class="footer-section">

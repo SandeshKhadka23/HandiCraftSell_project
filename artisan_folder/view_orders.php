@@ -13,10 +13,9 @@ $artisan_id = $_SESSION["user_id"];
 // Fetch all orders containing products made by this artisan
 $query = "
     SELECT DISTINCT o.order_id, o.order_date, o.status, 
-           u.username, u.email, 
+           o.full_name, o.phone, o.email, o.street_address, o.city, o.district, 
            p.payment_status, p.amount
     FROM Orders o
-    JOIN User u ON o.user_id = u.user_id
     JOIN OrderDetails od ON o.order_id = od.order_id
     JOIN Product pr ON od.product_id = pr.product_id
     LEFT JOIN Payments p ON o.order_id = p.order_id
@@ -64,8 +63,10 @@ $result = $stmt->get_result();
         <?php while ($order = $result->fetch_assoc()) { ?>
             <div class="order-card">
                 <h3>Order #<?php echo htmlspecialchars($order["order_id"]); ?></h3>
-                <p><strong>Customer:</strong> <?php echo htmlspecialchars($order["username"]); ?></p>
+                <p><strong>Customer Name:</strong> <?php echo htmlspecialchars($order["full_name"]); ?></p>
+                <p><strong>Phone:</strong> <?php echo htmlspecialchars($order["phone"]); ?></p>
                 <p><strong>Email:</strong> <?php echo htmlspecialchars($order["email"]); ?></p>
+                <p><strong>Address:</strong> <?php echo htmlspecialchars($order["street_address"] . ", " . $order["city"] . ", " . $order["district"]); ?></p>
                 <p><strong>Order Date:</strong> <?php echo $order["order_date"]; ?></p>
                 <p><strong>Status:</strong> <?php echo htmlspecialchars($order["status"]); ?></p>
                 <p><strong>Payment Status:</strong> <?php echo htmlspecialchars($order["payment_status"] ?? "Not Paid"); ?></p>

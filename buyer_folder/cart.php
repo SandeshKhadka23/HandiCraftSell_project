@@ -170,7 +170,6 @@ $result_cart = $stmt->get_result();
                         <?php echo $result_cart->num_rows; ?>
                     </span>
                 </a>
-                <a href="logout.php" class="nav-link">Logout</a>
             </div>
         </div>
     </nav>
@@ -242,7 +241,7 @@ $result_cart = $stmt->get_result();
             <div class="quicklinks">
                 <h3>Quick Links</h3>
                 <a href="buyer_dashboard.php">Home</a><br>
-                <a href="trackorders.php">Track Orders</a><br>
+                <a href="track_order.php">Track Orders</a><br>
                 <a href="cart.php">Cart</a>
             </div>
             <div class="footer-section">
