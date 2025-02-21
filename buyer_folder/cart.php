@@ -95,7 +95,7 @@ $result_cart = $stmt->get_result();
 
         .remove-btn {
             padding: 8px 16px;
-            background: #ff4444;
+            background: #b91111;
             color: white;
             border: none;
             border-radius: 4px;
@@ -170,7 +170,6 @@ $result_cart = $stmt->get_result();
                         <?php echo $result_cart->num_rows; ?>
                     </span>
                 </a>
-                <a href="logout.php" class="nav-link">Logout</a>
             </div>
         </div>
     </nav>

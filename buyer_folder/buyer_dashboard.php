@@ -62,7 +62,7 @@ $result_products = $conn->query($sql_products);
                 <i class="fas fa-shopping-cart"></i> Cart
                 <span class="cart-badge" id="cart-count">0</span>
             </a>
-            <a href="logout.php" class="nav-link">Logout</a>
+            <a href="../logout.php" class="nav-link">Logout</a>
         </div>
     </div>
 </nav>
@@ -175,6 +175,11 @@ function addToCart(button) {
     const qtyInput = productItem.querySelector('.qty-input');
     const quantity = parseInt(qtyInput.value);
 
+    // Show loading state
+    button.disabled = true;
+    const originalText = button.innerHTML;
+    button.innerHTML = 'Adding...';
+
     const formData = new FormData();
     formData.append('product_id', productId);
     formData.append('quantity', quantity);
@@ -186,8 +191,12 @@ function addToCart(button) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
+            // Update cart count with the actual count from server
+            const cartCountElement = document.getElementById('cart-count');
+            cartCountElement.textContent = data.cart_count;
+
+            // Show success message
             alert(`${quantity} x ${data.product_name} added to cart.`);
-            updateCartCount(); // Update cart count if needed
         } else {
             alert(data.message || 'Error adding to cart');
         }
@@ -195,8 +204,29 @@ function addToCart(button) {
     .catch(error => {
         console.error('Error:', error);
         alert('Error adding to cart');
+    })
+    .finally(() => {
+        // Reset button state
+        button.disabled = false;
+        button.innerHTML = originalText;
     });
 }
+
+// Add this function to update cart count on page load
+function updateCartCount() {
+    fetch('get_cart_count.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const cartCountElement = document.getElementById('cart-count');
+                cartCountElement.textContent = data.cart_count;
+            }
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+// Call updateCartCount when the page loads
+document.addEventListener('DOMContentLoaded', updateCartCount);
 
 function buyNow(button) {
     const productItem = button.closest('.product-item');

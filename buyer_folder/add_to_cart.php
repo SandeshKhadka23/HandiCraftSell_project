@@ -1,65 +1,131 @@
 <?php
 session_start();
+header('Content-Type: application/json');
 
-if (!isset($_SESSION["user_id"]) || $_SESSION["role"] != "buyer") {
-    echo json_encode(['success' => false, 'message' => 'Not logged in']);
-    exit();
+// Make sure user is logged in
+if (!isset($_SESSION['user_id'])) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'Please login to add items to cart'
+    ]);
+    exit;
 }
 
-// Database connection
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "HandicraftStore";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    echo json_encode(['success' => false, 'message' => 'Database connection failed']);
-    exit();
+// Validate input
+if (!isset($_POST['product_id']) || !isset($_POST['quantity'])) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'Missing required parameters'
+    ]);
+    exit;
 }
 
-if (isset($_POST['product_id']) && isset($_POST['quantity'])) {
-    $product_id = intval($_POST['product_id']);
-    $quantity = intval($_POST['quantity']);
-    $user_id = $_SESSION["user_id"];
+$user_id = $_SESSION['user_id'];
+$product_id = filter_var($_POST['product_id'], FILTER_VALIDATE_INT);
+$quantity = filter_var($_POST['quantity'], FILTER_VALIDATE_INT);
 
-    // Get the product price
-    $stmt = $conn->prepare("SELECT price FROM Product WHERE product_id = ?");
-    $stmt->bind_param("i", $product_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+// Validate product_id and quantity
+if (!$product_id || !$quantity || $quantity <= 0) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'Invalid product ID or quantity'
+    ]);
+    exit;
+}
 
-    if ($row = $result->fetch_assoc()) {
-        $price_per_unit = $row['price'];
+try {
+    // Database connection
+    $db = new PDO(
+        "mysql:host=localhost;dbname=HandicraftStore",
+        "root",
+        "",
+        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+    );
 
-        // Check if the product already exists in the cart
-        $stmt = $conn->prepare("SELECT cart_id, quantity FROM Cart WHERE product_id = ? AND user_id = ?");
-        $stmt->bind_param("ii", $product_id, $user_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
+    // Start transaction
+    $db->beginTransaction();
 
-        if ($result->num_rows > 0) {
-            // Product already in cart, update quantity
-            $row = $result->fetch_assoc();
-            $new_quantity = $row['quantity'] + $quantity;
+    // Check if product exists and get its details
+    $stmt = $db->prepare("
+        SELECT product_name, price, stock
+        FROM Product 
+        WHERE product_id = ? 
+        FOR UPDATE
+    ");
+    $stmt->execute([$product_id]);
+    $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            // Update the quantity in the cart
-            $update_stmt = $conn->prepare("UPDATE Cart SET quantity = ?, price_per_unit = ? WHERE cart_id = ?");
-            $update_stmt->bind_param("idi", $new_quantity, $price_per_unit, $row['cart_id']);
-            $update_stmt->execute();
-        } else {
-            // Product not in cart, insert new record
-            $insert_stmt = $conn->prepare("INSERT INTO Cart (user_id, product_id, quantity, price_per_unit) VALUES (?, ?, ?, ?)");
-            $insert_stmt->bind_param("iiii", $user_id, $product_id, $quantity, $price_per_unit);
-            $insert_stmt->execute();
-        }
-
-        echo json_encode(['success' => true, 'product_name' => $_POST['product_name']]);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Product not found']);
+    if (!$product) {
+        throw new Exception('Product not found');
     }
-} else {
-    echo json_encode(['success' => false, 'message' => 'Invalid parameters']);
+
+    // Check stock availability
+    if ($product['stock'] < $quantity) {
+        throw new Exception('Not enough stock available');
+    }
+
+    // Update product stock
+    $stmt = $db->prepare("
+        UPDATE Product 
+        SET stock = stock - ? 
+        WHERE product_id = ?
+    ");
+    $stmt->execute([$quantity, $product_id]);
+
+    // Check if product already exists in cart
+    $stmt = $db->prepare("
+        SELECT cart_id, quantity 
+        FROM Cart 
+        WHERE user_id = ? AND product_id = ?
+    ");
+    $stmt->execute([$user_id, $product_id]);
+    $existing_cart_item = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($existing_cart_item) {
+        // Update existing cart item
+        $stmt = $db->prepare("
+            UPDATE Cart 
+            SET quantity = quantity + ? 
+            WHERE cart_id = ?
+        ");
+        $stmt->execute([$quantity, $existing_cart_item['cart_id']]);
+    } else {
+        // Insert new cart item
+        $stmt = $db->prepare("
+            INSERT INTO Cart (user_id, product_id, quantity, price_per_unit) 
+            VALUES (?, ?, ?, ?)
+        ");
+        $stmt->execute([$user_id, $product_id, $quantity, $product['price']]);
+    }
+
+    // Get updated cart count
+    $stmt = $db->prepare("
+        SELECT SUM(quantity) as cart_count 
+        FROM Cart 
+        WHERE user_id = ?
+    ");
+    $stmt->execute([$user_id]);
+    $cart_count = $stmt->fetch(PDO::FETCH_ASSOC)['cart_count'];
+
+    // Commit transaction
+    $db->commit();
+
+    echo json_encode([
+        'success' => true,
+        'product_name' => $product['product_name'],
+        'cart_count' => $cart_count,
+        'message' => 'Product added to cart successfully'
+    ]);
+
+} catch (Exception $e) {
+    // Rollback transaction on error
+    if (isset($db)) {
+        $db->rollBack();
+    }
+
+    echo json_encode([
+        'success' => false,
+        'message' => $e->getMessage()
+    ]);
 }
 ?>
