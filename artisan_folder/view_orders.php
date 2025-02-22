@@ -42,7 +42,7 @@ $result = $stmt->get_result();
             <span class="brand-name">NepArt Creations</span>
         </div>
         <div class="nav-links">
-            <a href="dashboard.php" class="nav-button"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="artisan_dashboard.php" class="nav-button"><i class="fas fa-home"></i> Dashboard</a>
             <a href="add_product.php" class="nav-button"><i class="fas fa-plus"></i> Add Product</a>
             <a href="../logout.php" class="nav-button"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
@@ -109,7 +109,7 @@ $result = $stmt->get_result();
             </div>
             <div class="footer-section">
                 <h3>Quick Links</h3>
-                <a href="dashboard.php">Dashboard</a>
+                <a href="artisan_dashboard.php">Dashboard</a>
                 <a href="add_product.php">Add Product</a>
                 <a href="profile.php">Profile</a>
             </div>
