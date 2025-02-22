@@ -85,6 +85,7 @@ if (isset($_GET['product_id']) && isset($_GET['quantity'])) {
                 <a href="cart.php" class="nav-link cart-link">
                     <i class="fas fa-shopping-cart"></i> Cart
                 </a>
+                <a href="track_order.php" class="nav-link">Track Orders</a>
             </div>
         </div>
     </nav>
@@ -187,7 +188,7 @@ if (isset($_GET['product_id']) && isset($_GET['quantity'])) {
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2025 ArtisanCraft. All rights reserved.</p>
+            <p>&copy; 2025 NepArt Creations. All rights reserved.</p>
         </div>
     </footer>
 

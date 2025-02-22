@@ -194,7 +194,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2025 ArtisanCraft. All rights reserved.</p>
+            <p>&copy; 2025 NepArt Creations. All rights reserved.</p>
         </div>
     </footer>
 

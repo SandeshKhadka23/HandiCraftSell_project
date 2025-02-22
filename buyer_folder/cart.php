@@ -171,6 +171,7 @@ $result_cart = $stmt->get_result();
                         <?php echo $result_cart->num_rows; ?>
                     </span>
                 </a>
+                <a href="track_order.php" class="nav-link">Track Orders</a>
             </div>
         </div>
     </nav>
@@ -255,7 +256,7 @@ $result_cart = $stmt->get_result();
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2025 ArtisanCraft. All rights reserved.</p>
+            <p>&copy; 2025 NepArt Creations. All rights reserved.</p>
         </div>
     </footer>
 
