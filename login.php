@@ -4,18 +4,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome</title>
+    <title>Login - NepArt Creations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            font-family: 'Open Sans', sans-serif;
         }
 
+        /* Navigation styles */
+        .main-nav {
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 10px 0;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        .brand-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        /* Login container styles */
         .container {
             display: flex;
-            min-height: 100vh;
+            min-height: calc(100vh - 70px); /* Accounting for nav height */
             background: #fff;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             border-radius: 15px;
@@ -51,7 +86,7 @@
 
         input {
             width: 100%;
-            padding: 12px 0;
+            padding: 12px;
             border: none;
             border-bottom: 1px solid #ddd;
             outline: none;
@@ -77,7 +112,7 @@
         button {
             width: 100%;
             padding: 15px;
-            background: #C4A484;
+            background: #b91111;
             color: white;
             border: none;
             border-radius: 25px;
@@ -87,7 +122,7 @@
         }
 
         button:hover {
-            background: #B8926A;
+            background: #a31010;
         }
 
         .signup-link {
@@ -142,9 +177,19 @@
         }
     }
     ?>
+    
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <img src="artisan_folder/download.png" alt="Logo" class="logo">
+                <span class="brand-name">NepArt Creations</span>
+            </div>
+        </div>
+    </nav>
+
     <div class="container">
         <div class="left-panel">
-            <h2>Welcome</h2>
+            <h2>Welcome Back</h2>
             <form method="POST">
                 <div class="form-group">
                     <input type="email" name="email" required placeholder="EMAIL">

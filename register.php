@@ -4,18 +4,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Account</title>
+    <title>Create Account - NepArt Creations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            font-family: 'Open Sans', sans-serif;
         }
 
+        /* Navigation styles */
+        .main-nav {
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 10px 0;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        .brand-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        /* Container styles */
         .container {
             display: flex;
-            min-height: 100vh;
+            min-height: calc(100vh - 70px);
             background: #fff;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             border-radius: 15px;
@@ -51,12 +86,18 @@
 
         input, select {
             width: 100%;
-            padding: 12px 0;
+            padding: 12px;
             border: none;
             border-bottom: 1px solid #ddd;
             outline: none;
             font-size: 14px;
             color: #666;
+            background: transparent;
+        }
+
+        select {
+            cursor: pointer;
+            text-transform: uppercase;
         }
 
         input::placeholder {
@@ -68,17 +109,18 @@
         button {
             width: 100%;
             padding: 15px;
-            background: #C4A484;
+            background: #b91111;
             color: white;
             border: none;
             border-radius: 25px;
             cursor: pointer;
             font-size: 14px;
             margin-top: 20px;
+            transition: background-color 0.3s ease;
         }
 
         button:hover {
-            background: #B8926A;
+            background: #a31010;
         }
 
         .signin-link {
@@ -93,6 +135,17 @@
             border-radius: 20px;
             display: inline-block;
             margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .signin-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Style for the role select dropdown */
+        select option {
+            padding: 12px;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -133,6 +186,16 @@
         }
     }
     ?>
+
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <img src="artisan_folder/download.png" alt="Logo" class="logo">
+                <span class="brand-name">NepArt Creations</span>
+            </div>
+        </div>
+    </nav>
+
     <div class="container">
         <div class="left-panel">
             <p>If you already have an account, just sign in.</p>
@@ -154,8 +217,9 @@
                 </div>
                 <div class="form-group">
                     <select name="role" required>
-                        <option value="buyer">Buyer</option>
-                        <option value="artisan">Artisan</option>
+                        <option value="" disabled selected>SELECT ROLE</option>
+                        <option value="buyer">BUYER</option>
+                        <option value="artisan">ARTISAN</option>
                     </select>
                 </div>
                 <button type="submit">SIGN UP</button>
