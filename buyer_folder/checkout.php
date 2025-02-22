@@ -19,24 +19,45 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch cart items and total
-$user_id = $_SESSION["user_id"];
-$sql_cart = "SELECT c.cart_id, c.quantity, p.product_id, p.product_name, p.price, p.image 
-             FROM Cart c 
-             JOIN Product p ON c.product_id = p.product_id 
-             WHERE c.user_id = ?";
-
-$stmt = $conn->prepare($sql_cart);
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$result_cart = $stmt->get_result();
-
-// Calculate total
+// Initialize variables
+$cart_items = [];
 $total = 0;
-while ($row = $result_cart->fetch_assoc()) {
-    $total += $row["price"] * $row["quantity"];
+
+// Check if the user is coming from "Buy Now"
+if (isset($_GET['product_id']) && isset($_GET['quantity'])) {
+    $product_id = $_GET['product_id'];
+    $quantity = $_GET['quantity'];
+
+    // Fetch the product details
+    $sql_product = "SELECT product_id, product_name, price, image FROM Product WHERE product_id = ?";
+    $stmt_product = $conn->prepare($sql_product);
+    $stmt_product->bind_param("i", $product_id);
+    $stmt_product->execute();
+    $result_product = $stmt_product->get_result();
+
+    if ($result_product->num_rows > 0) {
+        $product = $result_product->fetch_assoc();
+        $product['quantity'] = $quantity;
+        $cart_items[] = $product;
+        $total += $product['price'] * $quantity;
+    }
+} else {
+    // Fetch cart items and total
+    $user_id = $_SESSION["user_id"];
+    $sql_cart = "SELECT c.cart_id, c.quantity, p.product_id, p.product_name, p.price, p.image 
+                 FROM Cart c 
+                 JOIN Product p ON c.product_id = p.product_id 
+                 WHERE c.user_id = ?";
+    $stmt_cart = $conn->prepare($sql_cart);
+    $stmt_cart->bind_param("i", $user_id);
+    $stmt_cart->execute();
+    $result_cart = $stmt_cart->get_result();
+
+    while ($row = $result_cart->fetch_assoc()) {
+        $cart_items[] = $row;
+        $total += $row["price"] * $row["quantity"];
+    }
 }
-$result_cart->data_seek(0); // Reset result pointer
 ?>
 
 <!DOCTYPE html>
@@ -48,7 +69,7 @@ $result_cart->data_seek(0); // Reset result pointer
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styleb.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-   <link rel="stylesheet" href="checkout.css">
+    <link rel="stylesheet" href="checkout.css">
 </head>
 <body>
     <nav class="main-nav">
@@ -124,11 +145,11 @@ $result_cart->data_seek(0); // Reset result pointer
             <h2>Order Summary</h2>
             <div class="order-items">
                 <?php
-                while ($row = $result_cart->fetch_assoc()) {
-                    $subtotal = $row["price"] * $row["quantity"];
+                foreach ($cart_items as $item) {
+                    $subtotal = $item["price"] * $item["quantity"];
                     ?>
                     <div class="order-item">
-                        <span><?php echo htmlspecialchars($row['product_name']); ?> (×<?php echo $row['quantity']; ?>)</span>
+                        <span><?php echo htmlspecialchars($item['product_name']); ?> (×<?php echo $item['quantity']; ?>)</span>
                         <span>Rs. <?php echo number_format($subtotal, 2); ?></span>
                     </div>
                     <?php
@@ -183,30 +204,40 @@ $result_cart->data_seek(0); // Reset result pointer
     }
 
     function placeOrder(event) {
-        event.preventDefault();
-        
-        const formData = new FormData(document.getElementById('checkoutForm'));
-        
-        fetch('place_order.php', { // Changed to 'place_order.php'
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showMessage('Order placed successfully!');
-                setTimeout(() => {
-                    window.location.href = 'track_order.php?order_id=' + data.order_id;
-                }, 2000);
-            } else {
-                showMessage(data.message || 'Error placing order', false);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showMessage('Error placing order', false);
-        });
+    event.preventDefault();
+    
+    const formData = new FormData(document.getElementById('checkoutForm'));
+
+    // Add product_id and quantity for "Buy Now" orders
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('product_id');
+    const quantity = urlParams.get('quantity');
+
+    if (productId && quantity) {
+        formData.append('product_id', productId);
+        formData.append('quantity', quantity);
     }
+
+    fetch('place_order.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showMessage('Order placed successfully!');
+            setTimeout(() => {
+                window.location.href = 'track_order.php?order_id=' + data.order_id;
+            }, 2000);
+        } else {
+            showMessage(data.message || 'Error placing order', false);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage('Error placing order', false);
+    });
+}
     </script>
 </body>
 </html>
