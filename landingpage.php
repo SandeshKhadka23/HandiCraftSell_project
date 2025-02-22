@@ -13,6 +13,24 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// searchbar functionality
+$search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
+$sql_products = "SELECT p.product_id, p.product_name, p.price, p.description, p.stock, p.image, p.category_id, c.category_name 
+                 FROM Product p 
+                 JOIN Category c ON p.category_id = c.category_id 
+                 WHERE p.stock > 0";
+
+if (!empty($search_query)) {
+    $search_query = "%" . $search_query . "%"; // Wildcard for partial matches
+    $sql_products .= " AND (p.product_name LIKE ? OR p.description LIKE ?)";
+}
+
+$stmt_products = $conn->prepare($sql_products);
+
+if (!empty($search_query)) {
+    $stmt_products->bind_param("ss", $search_query, $search_query);
+}
+
 // Fetch categories
 $sql_categories = "SELECT * FROM Category";
 $result_categories = $conn->query($sql_categories);
@@ -54,7 +72,10 @@ $result_products = $conn->query($sql_products);
             <span class="brand-name">NepArt Creations</span>
         </div>
         <div class="nav-right">
-            <input type="text" placeholder="Search products..." class="search-bar">
+            <form id="search-bar" method="GET" action="">
+    <input type="text" name="search" placeholder="Search products..." class="search-bar" value="<?php echo htmlspecialchars($search_query); ?>">
+    <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+</form>
             <select class="category-select" id="category-select" onchange="filterAndScrollToProducts()">
                 <option value="">Search By Category</option>
                 <?php

@@ -4,23 +4,18 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] != "buyer") {
     header("Location:../login.php");
     exit();
 }
-
 // Database connection
 $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "HandicraftStore";
-
 $conn = new mysqli($servername, $username, $password, $dbname);
-
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-
 // Fetch categories
 $sql_categories = "SELECT * FROM Category";
 $result_categories = $conn->query($sql_categories);
-
 // Fetch all products initially
 $sql_products = "SELECT p.product_id, p.product_name, p.price, p.description, p.stock, p.image, p.category_id, c.category_name 
                  FROM Product p 
@@ -28,7 +23,6 @@ $sql_products = "SELECT p.product_id, p.product_name, p.price, p.description, p.
                  WHERE p.stock > 0";
 $result_products = $conn->query($sql_products);
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -66,7 +60,6 @@ $result_products = $conn->query($sql_products);
         </div>
     </div>
 </nav>
-
 <section class="about">
     <div class="slider-container">
         <div class="about-content">
@@ -77,7 +70,6 @@ $result_products = $conn->query($sql_products);
         </div>
     </div>
 </section>
-
 <section class="products" id="products-section">
     <h1>Featured Products</h1>
     <div class="product-container" id="product-container">
@@ -107,7 +99,6 @@ $result_products = $conn->query($sql_products);
                 echo '<button class="cart-btn" onclick="addToCart(this)" data-product-id="' . $row["product_id"] . '">Add to Cart</button>';
                 echo '<button class="buy-now-btn" onclick="buyNow(this)" data-product-id="' . $row["product_id"] . '">Buy Now</button>';
                 echo '</div>';
-                
                 echo '</div>';
             }
         } else {
@@ -116,7 +107,6 @@ $result_products = $conn->query($sql_products);
         ?>
     </div>
 </section>
-
 <footer>
     <div class="footer-container">
         <div class="footer-section">
@@ -144,22 +134,16 @@ $result_products = $conn->query($sql_products);
         <p>&copy; 2025 ArtisanCraft. All rights reserved.</p>
     </div>
 </footer>
-
 <script>
-let cart = {};
-let cartCount = 0;
-
 function updateQuantity(button, change) {
     const qtyInput = button.parentElement.querySelector('.qty-input');
     let currentQty = parseInt(qtyInput.value);
     const maxQty = parseInt(qtyInput.max);
-
     if (change === 1 && currentQty < maxQty) {
         currentQty++;
     } else if (change === -1 && currentQty > 1) {
         currentQty--;
     }
-
     qtyInput.value = currentQty;
 }
 
@@ -169,21 +153,19 @@ function toggleDetails(button) {
     details.style.display = details.style.display === 'none' ? 'block' : 'none';
     button.textContent = details.style.display === 'block' ? 'Hide Details' : 'Show Details';
 }
+
 function addToCart(button) {
     const productItem = button.closest('.product-item');
     const productId = button.getAttribute('data-product-id');
     const qtyInput = productItem.querySelector('.qty-input');
     const quantity = parseInt(qtyInput.value);
-
     // Show loading state
     button.disabled = true;
     const originalText = button.innerHTML;
     button.innerHTML = 'Adding...';
-
     const formData = new FormData();
     formData.append('product_id', productId);
     formData.append('quantity', quantity);
-
     fetch('add_to_cart.php', {
         method: 'POST',
         body: formData
@@ -192,9 +174,7 @@ function addToCart(button) {
     .then(data => {
         if (data.success) {
             // Update cart count with the actual count from server
-            const cartCountElement = document.getElementById('cart-count');
-            cartCountElement.textContent = data.cart_count;
-
+            updateCartCount();
             // Show success message
             alert(`${quantity} x ${data.product_name} added to cart.`);
         } else {
@@ -212,7 +192,7 @@ function addToCart(button) {
     });
 }
 
-// Add this function to update cart count on page load
+// Function to update cart count dynamically
 function updateCartCount() {
     fetch('get_cart_count.php')
         .then(response => response.json())
@@ -233,20 +213,13 @@ function buyNow(button) {
     const productId = button.getAttribute('data-product-id');
     const qtyInput = productItem.querySelector('.qty-input');
     const quantity = parseInt(qtyInput.value);
-
     // Redirect to the checkout page with the product ID and quantity
     window.location.href = `checkout.php?product_id=${productId}&quantity=${quantity}`;
-}
-
-function updateCartCount() {
-    const cartCountElement = document.getElementById('cart-count');
-    cartCountElement.textContent = cartCount;
 }
 
 function filterAndScrollToProducts() {
     const selectedCategory = document.getElementById('category-select').value;
     const productItems = document.querySelectorAll('.product-item');
-
     productItems.forEach(item => {
         if (selectedCategory === "" || item.getAttribute('data-category-id') === selectedCategory) {
             item.style.display = 'block';
@@ -254,7 +227,6 @@ function filterAndScrollToProducts() {
             item.style.display = 'none';
         }
     });
-
     document.getElementById('products-section').scrollIntoView({ behavior: 'smooth' });
 }
 </script>

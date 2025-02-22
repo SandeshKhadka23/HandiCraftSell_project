@@ -9,7 +9,11 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] != "artisan") {
 
 if (isset($_GET['order_id'])) {
     $order_id = $_GET['order_id'];
-    $query = "SELECT * FROM Orders WHERE order_id = ?";
+    $query = $query = "SELECT Orders.*, payments.payment_status 
+    FROM Orders 
+    LEFT JOIN payments ON Orders.order_id = payments.order_id 
+    WHERE Orders.order_id = ?";
+;
     $stmt = $conn->prepare($query);
     $stmt->bind_param("i", $order_id);
     $stmt->execute();
@@ -27,15 +31,32 @@ if (isset($_GET['order_id'])) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $status = $_POST["status"];
-    $update_query = "UPDATE Orders SET status = ? WHERE order_id = ?";
-    $update_stmt = $conn->prepare($update_query);
-    $update_stmt->bind_param("si", $status, $order_id);
-    $update_stmt->execute();
+    $payment_status = $_POST["payment_status"];
 
-    if ($update_stmt->affected_rows > 0) {
-        $success_message = "Order status updated successfully!";
-    } else {
-        $error_message = "Failed to update order status.";
+    // Update order status
+    $update_order_query = "UPDATE Orders SET status = ? WHERE order_id = ?";
+    $update_order_stmt = $conn->prepare($update_order_query);
+    $update_order_stmt->bind_param("si", $status, $order_id);
+    $update_order_stmt->execute();
+
+    // Update payment status
+    $update_payment_query = "UPDATE payments SET payment_status = ? WHERE order_id = ?";
+    $update_payment_stmt = $conn->prepare($update_payment_query);
+    $update_payment_stmt->bind_param("si", $payment_status, $order_id);
+    $update_payment_stmt->execute();
+
+    if ($update_order_stmt->affected_rows > 0 && $update_payment_stmt->affected_rows == 0 ) {
+        $success_message = "Order Status updated successfully!";
+        $error_message="Payment Status Updation Failed!!";
+    } else if ( $update_payment_stmt->affected_rows > 0 && $update_order_stmt->affected_rows == 0 ) {
+        $success_message = "Payment Status Updated successfully!";
+        $error_message="Order Status Updation Failed!!";
+    }
+   else if ( $update_payment_stmt->affected_rows > 0 && $update_order_stmt->affected_rows > 0 ) {
+    $success_message = "Order Status and Payment Status Updated successfully!";
+    }
+    else {
+        $error_message="Status Updation Failed!!";
     }
 }
 ?>
@@ -57,7 +78,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="nav-links">
             <a href="artisan_dashboard.php" class="nav-button"><i class="fas fa-home"></i> Dashboard</a>
             <a href="view_orders.php" class="nav-button"><i class="fas fa-shopping-cart"></i> Manage Orders</a>
-            <a href="../logout.php" class="nav-button"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
     </nav>
 
@@ -95,13 +115,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <span class="label">Current Status:</span>
                         <span class="value status-badge"><?php echo htmlspecialchars($order['status']); ?></span>
                     </div>
+                    <div class="summary-item">
+                        <span class="label">Payment Status:</span>
+                        <span class="value payment-status"><?php echo htmlspecialchars($order['payment_status'] ?? "Not Paid"); ?></span>
+                    </div>
                 </div>
             </div>
 
             <form action="" method="POST">
                 <div class="form-group">
                     <label for="status">
-                        <i class="fas fa-tasks"></i> Update Status
+                        <i class="fas fa-tasks"></i> Update Order Status
                     </label>
                     <select id="status" name="status" required>
                         <option value="Pending" <?php if ($order["status"] == "Pending") echo "selected"; ?>>
@@ -118,6 +142,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </option>
                         <option value="Cancelled" <?php if ($order["status"] == "Cancelled") echo "selected"; ?>>
                             <i class="fas fa-times"></i> Cancelled
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="payment_status">
+                        <i class="fas fa-money-bill"></i> Update Payment Status
+                    </label>
+                    <select id="payment_status" name="payment_status" required>
+                        <option value="Pending" <?php if ($order["payment_status"] == "Pending") echo "selected"; ?>>
+                            <i class="fas fa-clock"></i> Pending
+                        </option>
+                        <option value="Paid" <?php if ($order["payment_status"] == "Paid") echo "selected"; ?>>
+                            <i class="fas fa-check"></i> Paid
+                        </option>
+                        <option value="Failed" <?php if ($order["payment_status"] == "Failed") echo "selected"; ?>>
+                            <i class="fas fa-times"></i> Failed
                         </option>
                     </select>
                 </div>
@@ -158,7 +199,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </footer>
 
     <style>
-        * {
+          * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -449,6 +490,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 width: 100%;
                 justify-content: center;
             }
+        }
+        /* Add this CSS for payment status */
+        .payment-status {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+        }
+
+        .payment-status.Pending {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .payment-status.Paid {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .payment-status.Failed {
+            background-color: #f8d7da;
+            color: #721c24;
         }
     </style>
 </body>

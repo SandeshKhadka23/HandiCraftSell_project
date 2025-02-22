@@ -2,37 +2,29 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
 if (!isset($_SESSION["user_id"]) || $_SESSION["role"] != "buyer") {
     header("Location:../login.php");
     exit();
 }
-
 $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "HandicraftStore";
-
 $conn = new mysqli($servername, $username, $password, $dbname);
-
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-
 $user_id = $_SESSION["user_id"];
-
 // Fetch orders for the logged-in user
 $sql_orders = "SELECT o.order_id, o.order_date, o.status 
                FROM Orders o 
                WHERE o.user_id = ? 
                ORDER BY o.order_date DESC";
-
 $stmt = $conn->prepare($sql_orders);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result_orders = $stmt->get_result();
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -48,7 +40,6 @@ $result_orders = $stmt->get_result();
             margin: 2rem auto;
             padding: 20px;
         }
-
         .order-card {
             background: white;
             padding: 1.5rem;
@@ -56,7 +47,6 @@ $result_orders = $stmt->get_result();
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             margin-bottom: 1.5rem;
         }
-
         .order-header {
             display: flex;
             justify-content: space-between;
@@ -65,22 +55,23 @@ $result_orders = $stmt->get_result();
             padding-bottom: 1rem;
             border-bottom: 1px solid #ddd;
         }
-
         .order-header h3 {
             margin: 0;
         }
-
         .order-status {
             font-weight: 600;
             padding: 0.5rem 1rem;
             border-radius: 4px;
             background: #f8f9fa;
         }
-
+        .payment-status {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-top: 0.5rem;
+        }
         .order-details {
             margin-top: 1rem;
         }
-
         .order-item {
             display: flex;
             justify-content: space-between;
@@ -88,11 +79,9 @@ $result_orders = $stmt->get_result();
             padding-bottom: 0.5rem;
             border-bottom: 1px solid #eee;
         }
-
         .order-item:last-child {
             border-bottom: none;
         }
-
         .total-line {
             display: flex;
             justify-content: space-between;
@@ -101,13 +90,11 @@ $result_orders = $stmt->get_result();
             padding-top: 1rem;
             border-top: 2px solid #ddd;
         }
-
         @media (max-width: 768px) {
             .order-header {
                 flex-direction: column;
                 align-items: flex-start;
             }
-
             .order-status {
                 margin-top: 0.5rem;
             }
@@ -131,7 +118,6 @@ $result_orders = $stmt->get_result();
             </div>
         </div>
     </nav>
-
     <div class="track-orders-container">
         <h1>Track Orders</h1>
         <?php
@@ -140,7 +126,17 @@ $result_orders = $stmt->get_result();
                 $order_id = $order["order_id"];
                 $order_date = $order["order_date"];
                 $status = $order["status"];
-
+                // Fetch payment status for this order
+                $sql_payment = "SELECT payment_status FROM Payments WHERE order_id = ?";
+                $stmt_payment = $conn->prepare($sql_payment);
+                $stmt_payment->bind_param("i", $order_id);
+                $stmt_payment->execute();
+                $result_payment = $stmt_payment->get_result();
+                $payment_status = "Pending"; // Default value
+                if ($result_payment->num_rows > 0) {
+                    $payment = $result_payment->fetch_assoc();
+                    $payment_status = $payment["payment_status"];
+                }
                 // Fetch order details for this order
                 $sql_order_details = "SELECT od.product_id, od.quantity, od.price_per_unit, od.subtotal, p.product_name 
                                      FROM OrderDetails od 
@@ -150,7 +146,6 @@ $result_orders = $stmt->get_result();
                 $stmt_details->bind_param("i", $order_id);
                 $stmt_details->execute();
                 $result_details = $stmt_details->get_result();
-
                 $total_amount = 0;
                 ?>
                 <div class="order-card">
@@ -168,6 +163,9 @@ $result_orders = $stmt->get_result();
                                 <span><?php echo htmlspecialchars($detail['product_name']); ?> (×<?php echo $detail['quantity']; ?>)</span>
                                 <span>Rs. <?php echo number_format($detail['subtotal'], 2); ?></span>
                             </div>
+                            <div class="payment-status">
+                        Payment Status: <?php echo $payment_status; ?> 
+                    </div>
                             <?php
                         }
                         ?>
@@ -184,7 +182,6 @@ $result_orders = $stmt->get_result();
         }
         ?>
     </div>
-
     <footer>
         <div class="footer-container">
             <div class="footer-section">

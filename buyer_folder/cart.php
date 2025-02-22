@@ -121,6 +121,7 @@ $result_cart = $stmt->get_result();
             font-size: 1.1rem;
             cursor: pointer;
             margin-top: 1rem;
+            text-decoration: none;
         }
 
         .empty-cart {
@@ -259,6 +260,21 @@ $result_cart = $stmt->get_result();
     </footer>
 
     <script>
+        
+        function updateCartCount() {
+    fetch('get_cart_count.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const cartCountElement = document.getElementById('cart-count');
+                cartCountElement.textContent = data.cart_count;
+            }
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+// Call updateCartCount when the page loads
+document.addEventListener('DOMContentLoaded', updateCartCount);
     function showMessage(message, isSuccess = true) {
         const messageElement = document.getElementById('response-message');
         messageElement.textContent = message;
@@ -288,10 +304,10 @@ $result_cart = $stmt->get_result();
             const quantityElement = cartItem.querySelector('.quantity');
             const cartCountElement = document.getElementById('cart-count');
             
-            // Update cart badge count
-            if (cartCountElement && data.cartCount !== undefined) {
-                cartCountElement.textContent = data.cartCount;
-            }
+              // Update cart count after quantity change
+              updateCartCount();
+            // Reload the page to reflect changes
+            location.reload();
             
             // Update quantity
             if (quantityElement && data.newQuantity !== undefined) {
@@ -324,10 +340,10 @@ function removeCartItem(cartId) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                const cartCountElement = document.getElementById('cart-count');
-                if (cartCountElement && data.cartCount !== undefined) {
-                    cartCountElement.textContent = data.cartCount;
-                }
+                 // Update cart count after quantity change
+            updateCartCount();
+            // Reload the page to reflect changes
+            location.reload();
                 location.reload();
                 showMessage(data.message || 'Item removed successfully');
             } else {

@@ -9,6 +9,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] != "artisan") {
 
 $artisan_id = $_SESSION["user_id"];
 
+// Fetch all orders containing products made by this artisan
 $query = "
     SELECT DISTINCT o.order_id, o.order_date, o.status, 
            o.full_name, o.phone, o.email, o.street_address, o.city, o.district, 
@@ -44,7 +45,6 @@ $result = $stmt->get_result();
         <div class="nav-links">
             <a href="artisan_dashboard.php" class="nav-button"><i class="fas fa-home"></i> Dashboard</a>
             <a href="add_product.php" class="nav-button"><i class="fas fa-plus"></i> Add Product</a>
-            <a href="../logout.php" class="nav-button"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
     </nav>
 
@@ -57,11 +57,25 @@ $result = $stmt->get_result();
 
     <section class="orders-section">
         <div class="orders-container">
-            <?php while ($order = $result->fetch_assoc()) { ?>
+            <?php while ($order = $result->fetch_assoc()) { 
+                // Fetch product details for this order
+                $order_id = $order["order_id"];
+                $sql_products = "
+                    SELECT pr.product_name, pr.image, od.quantity, od.price_per_unit, od.subtotal, o.order_date
+                    FROM OrderDetails od
+                    JOIN Product pr ON od.product_id = pr.product_id
+                    JOIN Orders o ON od.order_id = o.order_id
+                    WHERE od.order_id = ?
+                ";
+                $stmt_products = $conn->prepare($sql_products);
+                $stmt_products->bind_param("i", $order_id);
+                $stmt_products->execute();
+                $result_products = $stmt_products->get_result();
+            ?>
                 <div class="order-card">
                     <div class="order-header">
                         <h3>Order #<?php echo htmlspecialchars($order["order_id"]); ?></h3>
-                        <span class="order-date"><?php echo date('F j, Y', strtotime($order["order_date"])); ?></span>
+                        <span class="order-date"><?php echo date('F j, Y, g:i A', strtotime($order["order_date"])); ?></span>
                     </div>
                     
                     <div class="order-details">
@@ -87,8 +101,24 @@ $result = $stmt->get_result();
                                     <?php echo htmlspecialchars($order["payment_status"] ?? "Not Paid"); ?>
                                 </span>
                             </p>
-                            <p><strong>Amount:</strong> NRS <?php echo number_format($order["amount"] ?? 0, 2); ?></p>
                         </div>
+                    </div>
+
+                    <!-- Product Details Section -->
+                    <div class="product-details">
+                        <h4><i class="fas fa-box"></i> Products Ordered</h4>
+                        <?php while ($product = $result_products->fetch_assoc()) { ?>
+                            <div class="product-item">
+                                <img src="../uploads/products/<?php echo htmlspecialchars($product['image']); ?>" alt="<?php echo htmlspecialchars($product['product_name']); ?>" class="product-image">
+                                <div class="product-info">
+                                    <p><strong>Product:</strong> <?php echo htmlspecialchars($product['product_name']); ?></p>
+                                    <p><strong>Quantity:</strong> <?php echo $product['quantity']; ?></p>
+                                    <p><strong>Price per Unit:</strong> NRS <?php echo number_format($product['price_per_unit'], 2); ?></p>
+                                    <p><strong>Subtotal:</strong> NRS <?php echo number_format($product['subtotal'], 2); ?></p>
+                                    <p><strong>Ordered On:</strong> <?php echo date('F j, Y, g:i A', strtotime($product['order_date'])); ?></p>
+                                </div>
+                            </div>
+                        <?php } ?>
                     </div>
 
                     <div class="order-actions">
@@ -111,7 +141,6 @@ $result = $stmt->get_result();
                 <h3>Quick Links</h3>
                 <a href="artisan_dashboard.php">Dashboard</a>
                 <a href="add_product.php">Add Product</a>
-                <a href="profile.php">Profile</a>
             </div>
             <div class="footer-section">
                 <h3>Contact</h3>
@@ -124,8 +153,9 @@ $result = $stmt->get_result();
         </div>
     </footer>
 
+
     <style>
-        * {
+          * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -374,6 +404,48 @@ $result = $stmt->get_result();
                 width: 100%;
                 text-align: center;
             }
+        }
+       /* Add this CSS for the product details section */
+       .product-details {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+
+        .product-details h4 {
+            margin-bottom: 1rem;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .product-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: #ffffff;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .product-item img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .product-info p {
+            margin: 0.3rem 0;
+            color: #666;
+        }
+
+        .product-info p strong {
+            color: #2c3e50;
         }
     </style>
 </body>

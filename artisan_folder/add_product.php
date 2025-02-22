@@ -28,7 +28,6 @@ $categoryResult = $conn->query($categoryQuery);
         <div class="nav-links">
             <a href="artisan_dashboard.php" class="nav-button"><i class="fas fa-home"></i> Dashboard</a>
             <a href="view_orders.php" class="nav-button"><i class="fas fa-shopping-cart"></i> Manage Orders</a>
-            <a href="../logout.php" class="nav-button"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
     </nav>
 
@@ -118,7 +117,6 @@ $categoryResult = $conn->query($categoryQuery);
                 <h3>Quick Links</h3>
                 <a href="artisan_dashboard.php">Dashboard</a>
                 <a href="view_orders.php">Orders</a>
-                <a href="profile.php">Profile</a>
             </div>
             <div class="footer-section">
                 <h3>Contact</h3>
