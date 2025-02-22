@@ -55,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <span class="brand-name">NepArt Creations</span>
         </div>
         <div class="nav-links">
-            <a href="dashboard.php" class="nav-button"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="artisan_dashboard.php" class="nav-button"><i class="fas fa-home"></i> Dashboard</a>
             <a href="view_orders.php" class="nav-button"><i class="fas fa-shopping-cart"></i> Manage Orders</a>
             <a href="../logout.php" class="nav-button"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
