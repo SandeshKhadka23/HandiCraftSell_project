@@ -178,8 +178,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-section">
-                <h3>ArtisanCraft</h3>
-                <p>Empowering artisans to showcase their craft to the world.</p>
+                <h3>NepArt Creations</h3>
+                <p>Handmade Treasures, One Click Away.</p>
             </div>
             <div class="footer-section">
                 <h3>Quick Links</h3>

@@ -40,7 +40,7 @@ $result = $stmt->get_result();
         <div class="slider-container">
             <div class="about-content">
                 <h1>Welcome to Your Artisan Dashboard</h1>
-                <p><i>"Handmade Heritage, Crafted with Love"</i></p>
+                <p><i>✨ "Handmade Treasures, One Click Away." ✨</i></p>
                 <br><br>
                 <p>Showcase your handcrafted masterpieces to the world. Create, manage, and grow your artisan business with our platform.</p>
             </div>
@@ -96,8 +96,8 @@ $result = $stmt->get_result();
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-section">
-                <h3>ArtisanCraft</h3>
-                <p>Empowering artisans to showcase their craft to the world.</p>
+                <h3>NepArt Creations</h3>
+                <p>Handmade Treasures, One Click Away.</p>
             </div>
             <div class="footer-section">
                 <h3>Quick Links</h3>
