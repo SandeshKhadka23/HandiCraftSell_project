@@ -87,7 +87,7 @@ $result_categories = $conn->query($sql_categories);
     <div class="slider-container">
         <div class="about-content">
             <h1>Welcome to NepArt Creations</h1>
-            <p><i>"Handmade Heritage, Crafted with Love"</i></p>
+            <p><i>✨ "Handmade Treasures, One Click Away." ✨</i></p>
             <br><br>
             <p>Find and Purchase Your Favorite Handicrafts at the Best Prices.</p>
         </div>

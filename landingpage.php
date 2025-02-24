@@ -96,7 +96,7 @@ $result_categories = $conn->query($sql_categories);
     <div class="slider-container">
         <div class="about-content">
             <h1>Welcome to NepArt Creations</h1>
-            <p><i>"Crafted by Hands, Loved by Hearts"</i></p>
+            <p><i>✨ "Handmade Treasures, One Click Away." ✨</i></p>
             <br><br>
             <p>Every craft embodies Nepal’s tradition, passion, and creativity.</p>
             <p>Celebrate artistry with handmade products that connect cultures and generations.</p>
